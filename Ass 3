@@ -1,0 +1,73 @@
+q1. Select All: SQL Query to fetch all details
+sol in mysql -> SELECT * FROM CITY;
+
+q2. Select By ID: SQL query to fetch details by ID
+solution:
+SELECT * FROM CITY
+WHERE ID = 1661;
+
+q3.Employee Names: SQL Query to list all employees' names
+solution:
+SELECT name
+FROM Employee
+ORDER BY name ASC;
+
+q4.Japanese Cities: Query to filter Japanese City
+solution:
+SELECT * 
+FROM CITY
+WHERE COUNTRYCODE = 'JPN';
+
+q5.Weather Observation Station 1: SQL Query to list of city and state
+solution:
+SELECT CITY ,STATE
+from Station;
+
+q6.Weather Observation Station 3: Query a list of CITY names from STATION for cities that have an even ID number
+solution:
+Select distinct CITY
+From Station
+where MOD (ID,2)=0;
+
+q7.Weather Observation Station 4: Find the difference between the total number of CITY entries in the table and the number of distinct CITY entries in the table.
+solution:
+SELECT COUNT(*) - COUNT(DISTINCT CITY) AS non_unique_city_count
+FROM STATION;
+
+q8.Weather Observation Station 5: Query the two cities in STATION with the shortest and longest CITY names, as well as their respective lengths
+solution:
+(
+    SELECT CITY, LENGTH(CITY) AS LENGTH
+    FROM STATION
+    ORDER BY LENGTH(CITY), CITY
+    LIMIT 1
+)
+UNION ALL
+(
+    SELECT CITY, LENGTH(CITY) AS LENGTH
+    FROM STATION
+    ORDER BY LENGTH(CITY) DESC, CITY
+    LIMIT 1
+);
+
+q9.Average Population: Query the average population for all cities in CITY, rounded down to the nearest integer.
+solution:
+SELECT FLOOR(AVG(POPULATION)) FROM CITY;
+
+
+q10.Average Population: Query the average population for all cities in CITY, rounded down to the nearest integer.
+solution:
+SELECT 
+    c.CONTINENT, 
+    FLOOR(AVG(ci.POPULATION)) AS AVERAGE_POPULATION
+FROM 
+    COUNTRY c
+JOIN 
+    CITY ci ON c.CODE = ci.COUNTRYCODE
+GROUP BY 
+    c.CONTINENT;
+
+
+
+
+
