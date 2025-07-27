@@ -1,0 +1,122 @@
+q1
+SELECT DISTINCT CITY
+FROM STATION
+WHERE LOWER(SUBSTR(CITY, 1, 1)) IN ('a', 'e', 'i', 'o', 'u')
+  AND LOWER(SUBSTR(CITY, -1)) IN ('a', 'e', 'i', 'o', 'u');
+
+q2
+SELECT MAX(POPULATION) - MIN(POPULATION) AS population_difference
+FROM CITY;
+
+q3
+SELECT ROUND(
+    SQRT(
+        POWER(MAX(LAT_N) - MIN(LAT_N), 2) + 
+        POWER(MAX(LONG_W) - MIN(LONG_W), 2)
+    ),
+    4
+) AS euclidean_distance
+FROM STATION;
+
+q4
+WITH Ordered AS (
+    SELECT LAT_N, ROW_NUMBER() OVER (ORDER BY LAT_N) AS rn,
+           COUNT(*) OVER () AS total
+    FROM STATION
+)
+SELECT ROUND(AVG(LAT_N), 4) AS median
+FROM Ordered
+WHERE rn IN (FLOOR((total + 1)/2), CEIL((total + 1)/2));
+
+q5
+SELECT CITY.NAME
+FROM CITY
+JOIN COUNTRY
+  ON CITY.COUNTRYCODE = COUNTRY.CODE
+WHERE COUNTRY.CONTINENT = 'Africa';
+
+q6
+SELECT CITY.NAME
+FROM CITY
+JOIN COUNTRY
+  ON CITY.COUNTRYCODE = COUNTRY.CODE
+WHERE COUNTRY.CONTINENT = 'Africa';
+
+q7
+SELECT
+    CASE
+        WHEN g.Grade < 8 THEN NULL
+        ELSE s.Name
+    END AS Name,
+    g.Grade,
+    s.Marks
+FROM Students s
+JOIN Grades g
+  ON s.Marks BETWEEN g.Min_Mark AND g.Max_Mark
+ORDER BY
+    g.Grade DESC,
+    CASE
+        WHEN g.Grade < 8 THEN s.Marks
+        ELSE s.Name
+    END;
+
+q8
+SELECT s.hacker_id, h.name
+FROM Submissions s
+JOIN Challenges c ON s.challenge_id = c.challenge_id
+JOIN Difficulty d ON c.difficulty_level = d.difficulty_level
+JOIN Hackers h ON s.hacker_id = h.hacker_id
+WHERE s.score = d.score
+GROUP BY s.hacker_id, h.name
+HAVING COUNT(DISTINCT s.challenge_id) > 1
+ORDER BY COUNT(DISTINCT s.challenge_id) DESC, s.hacker_id ASC;
+
+q9
+SELECT 
+    w.id, 
+    wp.age, 
+    w.coins_needed, 
+    w.power
+FROM 
+    Wands w
+JOIN 
+    Wands_Property wp ON w.code = wp.code
+WHERE 
+    wp.is_evil = 0
+    AND w.coins_needed = (
+        SELECT MIN(w2.coins_needed)
+        FROM Wands w2
+        JOIN Wands_Property wp2 ON w2.code = wp2.code
+        WHERE wp2.is_evil = 0 
+          AND wp2.age = wp.age 
+          AND w2.power = w.power
+    )
+ORDER BY 
+    w.power DESC, 
+    wp.age DESC;
+
+q10
+SELECT 
+    h.hacker_id, 
+    h.name, 
+    SUM(s.max_score) AS total_score
+FROM 
+    Hackers h
+JOIN 
+    (
+        SELECT 
+            hacker_id, 
+            challenge_id, 
+            MAX(score) AS max_score
+        FROM 
+            Submissions
+        GROUP BY 
+            hacker_id, challenge_id
+    ) s ON h.hacker_id = s.hacker_id
+GROUP BY 
+    h.hacker_id, h.name
+HAVING 
+    total_score > 0
+ORDER BY 
+    total_score DESC, 
+    h.hacker_id ASC;
